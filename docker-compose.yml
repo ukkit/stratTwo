@@ -1,0 +1,87 @@
+# docker-compose.yml
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql/mysql_data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    networks:
+      - app_network
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    container_name: php_container
+    restart: always
+    volumes:
+      - ./www:/var/www/html
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    networks:
+      - app_network
+    ports:
+      - '8100:80'
+
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: python_container
+    volumes:
+      - ./app:/app
+    restart: always
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    networks:
+      - app_network
+    ports:
+      - '5000:5000'
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_container
+    restart: always
+    depends_on:
+      - php
+      - python
+    networks:
+      - app_network
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    ports:
+      - '80:80'
+
+  # # Adminer service
+  adminer:
+    image: adminer
+    container_name: adminer_container
+    restart: always
+    ports:
+      - '8080:8080'
+    networks:
+      - app_network
+    environment:
+      - ADMINER_DEFAULT_SERVER=mysql_container
+      - ADMINER_DESIGN=pepa-linha # Optional for a better UI
+    command: php -S 0.0.0.0:8080 -t /var/www/html # Force IPv4 binding
+
+volumes:
+  mysql-data:

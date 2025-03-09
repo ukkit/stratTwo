@@ -1,0 +1,24 @@
+# Database and ORM
+mysqlclient
+sqlalchemy
+pymysql
+flask-sqlalchemy
+mysql-connector-python
+
+# Optional data science/analysis tools
+pandas
+numpy
+matplotlib
+cryptography
+
+# Optional web framework
+flask
+
+#required for app
+wget
+yfinance
+quantstats
+argparse
+mftool
+nsepython
+casparser

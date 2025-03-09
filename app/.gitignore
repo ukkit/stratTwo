@@ -1,0 +1,4 @@
+# Ignore below
+**/__pycache__/
+database.ini
+t_*
