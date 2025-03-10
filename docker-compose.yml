@@ -96,5 +96,19 @@ services:
       - ADMINER_DESIGN=pepa-linha # Optional for a better UI
     command: php -S 0.0.0.0:8080 -t /var/www/html # Force IPv4 binding
 
+  telegram:
+    build:
+      context: .
+      dockerfile: Dockerfile.telegram
+    container_name: telegram_bot_container
+    volumes:
+      - ./telegram:/telegram
+    restart: always
+    depends_on:
+      - scheduler
+    env_file:
+      - .env
+    networks:
+      - app_network
 volumes:
   mysql-data:
