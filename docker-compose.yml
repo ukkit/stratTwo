@@ -55,6 +55,19 @@ services:
     ports:
       - '5000:5000'
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    container_name: scheduler_container
+    volumes:
+      - ./app:/app
+    restart: always
+    depends_on:
+      - python
+    networks:
+      - app_network
+
   nginx:
     image: nginx:latest
     container_name: nginx_container

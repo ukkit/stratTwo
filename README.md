@@ -1,6 +1,6 @@
-# Docker Multi-Container Setup (PHP, Python, MySQL, Adminer, Nginx)
+# Docker Multi-Container Setup (PHP, Python, MySQL, Adminer, Nginx, Scheduler)
 
-This project sets up a **multi-container environment** using **Docker Compose** for running PHP, Python, MySQL, Adminer, and Nginx. The containers are configured to share a **single MySQL database** and use Nginx as a reverse proxy.
+This project sets up a **multi-container environment** using **Docker Compose** for running PHP, Python, MySQL, Adminer, Nginx, and a Python Scheduler. The containers are configured to share a **single MySQL database** and use Nginx as a reverse proxy.
 
 ## **Project Structure**
 
@@ -19,6 +19,10 @@ This project sets up a **multi-container environment** using **Docker Compose** 
 ├── mysql/
 │   ├── data/
 │   ├── init.sql
+├── scheduler/
+│   ├── Dockerfile.scheduler
+│   ├── cronjob
+│   ├── myscript.py
 ├── adminer/
 ├── .env
 └── README.md
@@ -93,7 +97,36 @@ docker exec -it mysql_container mysql -uuser -ppassword mydatabase
 
 ---
 
-## **5. Troubleshooting**
+## **5. Scheduler Container (Cron Jobs for Python Scripts)**
+
+A `scheduler` service is included to run scheduled Python jobs using **cron**.
+
+### **Adding Scheduled Jobs**
+
+The schedule is defined in the `cronjob` file inside the `scheduler/` directory. Example:
+
+```cron
+# Run myscript.py every day at 2 AM
+0 2 * * * root python3 /app/myscript.py >> /app/cron.log 2>&1
+```
+
+### **Checking Scheduler Logs**
+
+To check if the scheduled job ran successfully:
+
+```sh
+docker exec -it scheduler_container cat /app/cron.log
+```
+
+To manually trigger the script for testing:
+
+```sh
+docker exec -it scheduler_container python3 /app/myscript.py
+```
+
+---
+
+## **6. Troubleshooting**
 
 ### **1. Nginx Shows "502 Bad Gateway"?**
 
@@ -151,7 +184,7 @@ docker exec -it php_container mysql -h mysql_container -uuser -ppassword mydatab
 
 ---
 
-## **6. Stopping & Cleaning Up**
+## **7. Stopping & Cleaning Up**
 
 To stop all containers:
 
@@ -167,7 +200,7 @@ docker-compose down --volumes --remove-orphans
 
 ---
 
-## **7. Extending the Setup**
+## **8. Extending the Setup**
 
 - Add **additional services** (Redis, Node.js, etc.).
 - Configure **SSL/TLS** using Let's Encrypt.
@@ -175,7 +208,7 @@ docker-compose down --volumes --remove-orphans
 
 ---
 
-## **8. License**
+## **9. License**
 
 This project is licensed under the **MIT License**.
 

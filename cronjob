@@ -1,0 +1,2 @@
+# Run myscript.py every day at 2 AM
+0 2 * * * root python3 /app/myscript.py >> /app/cron.log 2>&1
